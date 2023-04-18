@@ -21,8 +21,7 @@ def guess_word(guess, n):
         print("Invalid input. Length of word should be ", n, " characters")
         return
         
-    greenLettersIndex = []
-    yellowLettersIndex = []
+    
         
     while tries < MAX_TRIES:
         # Check if guess is total equal to the secret word
@@ -30,27 +29,30 @@ def guess_word(guess, n):
             print("Correct word!")
             return
         
+        greenLettersIndex = []
+        yellowLettersIndex = []
+        
         # Otherwise there are two things we need to take care about
         
         # 1. If there are correct letters at the correct position
         # If yes color changes to green
-        for i in range(len(guess)):
-            char = guess[i]
-            if char in SECRET_WORD and SECRET_WORD.index(char) == i and i not in greenLettersIndex:
+        for i,char in enumerate(guess):
+            print(char, " " , SECRET_WORD[i])
+            if char == SECRET_WORD[i] and i not in greenLettersIndex:
                 greenLettersIndex.append(i)
-                    
         # 2. If there are correct letters at the incorrect position
         # If yes color changes to yellow
-        for i in range(len(guess)):
-            char = guess[i]
-            if char in SECRET_WORD and SECRET_WORD.index(char) != i and i not in yellowLettersIndex and i not in greenLettersIndex:
+        for i, char in enumerate(guess):
+            print(char, " ", SECRET_WORD[i])
+            print(char != SECRET_WORD[i])
+            if char in SECRET_WORD and char != SECRET_WORD[i] and i not in yellowLettersIndex and i not in greenLettersIndex:
                 yellowLettersIndex.append(i)
-        
+
         for index in greenLettersIndex:
-            print("You have guessed ", guess[index], " correctly and at correct position")
+            print("You have guessed ", guess[index], " correctly and at correct position ", index)
         
         for index in yellowLettersIndex:
-            print("You have guessed ", guess[index], " correctly but at wrong position")
+            print("You have guessed ", guess[index], " correctly but at wrong position ", index)
         
         tries += 1
         
