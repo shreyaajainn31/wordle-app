@@ -1,4 +1,5 @@
 import json
+import string
 
 API_URL = "/wordle/guess_word"
 SECRET_WORD = ""
@@ -17,47 +18,59 @@ def guess_word(guess, n):
     elif n == 7:
         SECRET_WORD = "eardrop"
     
+    guess = guess.lower()
+    
     if len(guess) != n:
         print("Invalid input. Length of word should be ", n, " characters")
-        return
-        
-    
         
     while tries < MAX_TRIES:
-        # Check if guess is total equal to the secret word
-        if guess == SECRET_WORD:
-            print("Correct word!")
-            return
         
         greenLettersIndex = []
         yellowLettersIndex = []
+        greyLetters = []
         
-        # Otherwise there are two things we need to take care about
+        # There are following cases
         
-        # 1. If there are correct letters at the correct position
+        
+        # 1. Letters are not in SECRET_WORD
+        # If yes color changes to grey
+        for char in guess:
+            if char not in SECRET_WORD:
+                greyLetters.append(char)
+        
+        # 2. If there are correct letters at the correct position
         # If yes color changes to green
+        
         for i,char in enumerate(guess):
-            print(char, " " , SECRET_WORD[i])
             if char == SECRET_WORD[i] and i not in greenLettersIndex:
                 greenLettersIndex.append(i)
-        # 2. If there are correct letters at the incorrect position
+       
+        # 3. If there are correct letters at the incorrect position
         # If yes color changes to yellow
         for i, char in enumerate(guess):
-            print(char, " ", SECRET_WORD[i])
-            print(char != SECRET_WORD[i])
             if char in SECRET_WORD and char != SECRET_WORD[i] and i not in yellowLettersIndex and i not in greenLettersIndex:
                 yellowLettersIndex.append(i)
+                
+        print("These are the green letter words:")
+        for char_index in greenLettersIndex:
+            print(guess[char_index])
 
-        for index in greenLettersIndex:
-            print("You have guessed ", guess[index], " correctly and at correct position ", index)
-        
-        for index in yellowLettersIndex:
-            print("You have guessed ", guess[index], " correctly but at wrong position ", index)
-        
+        print("These are the yellow letter words:")
+        for char_index in yellowLettersIndex:
+            print(guess[char_index])
+
+        print("These are the grey letter words:")
+        for char in greyLetters:
+            print(char)
+
+        # We have the correct word
+        if len(greenLettersIndex) == n:
+            print("Congratulations!!!! ")
+            return [],[],[]       
+            
         tries += 1
         
         if tries < MAX_TRIES:
             guess = input("Enter your guess: ")
         
-    
-    print("No correct guesses yet")
+    return greenLettersIndex, yellowLettersIndex, greyLetters
