@@ -21,14 +21,16 @@ def guess_word(guess, n):
         print("Invalid input. Length of word should be ", n, " characters")
         return
         
-    greenLettersIndex = []
-    yellowLettersIndex = []
+    
         
     while tries < MAX_TRIES:
         # Check if guess is total equal to the secret word
         if guess == SECRET_WORD:
             print("Correct word!")
             return
+        
+        greenLettersIndex = []
+        yellowLettersIndex = []
         
         # Otherwise there are two things we need to take care about
         
@@ -37,11 +39,12 @@ def guess_word(guess, n):
         for i,char in enumerate(guess):
             print(char, " " , SECRET_WORD[i])
             if char == SECRET_WORD[i] and i not in greenLettersIndex:
-                greenLettersIndex.append(i)  
+                greenLettersIndex.append(i)
         # 2. If there are correct letters at the incorrect position
         # If yes color changes to yellow
         for i, char in enumerate(guess):
             print(char, " ", SECRET_WORD[i])
+            print(char != SECRET_WORD[i])
             if char in SECRET_WORD and char != SECRET_WORD[i] and i not in yellowLettersIndex and i not in greenLettersIndex:
                 yellowLettersIndex.append(i)
 
