@@ -34,23 +34,23 @@ def guess_word(guess, n):
         
         # 1. If there are correct letters at the correct position
         # If yes color changes to green
-        for i in range(len(guess)):
-            char = guess[i]
-            if char in SECRET_WORD and SECRET_WORD.index(char) == i and i not in greenLettersIndex:
+        for i,char in enumerate(guess):
+            if char == SECRET_WORD[i] and i not in greenLettersIndex:
+                print("This is what you guessed at this index: ", char)
+                print("this is what it actually is: ", SECRET_WORD[i])
                 greenLettersIndex.append(i)
                     
         # 2. If there are correct letters at the incorrect position
         # If yes color changes to yellow
-        for i in range(len(guess)):
-            char = guess[i]
+        for i,char in enumerate(guess):
             if char in SECRET_WORD and SECRET_WORD.index(char) != i and i not in yellowLettersIndex and i not in greenLettersIndex:
                 yellowLettersIndex.append(i)
         
         for index in greenLettersIndex:
-            print("You have guessed ", guess[index], " correctly and at correct position")
+            print("You have guessed ", guess[index], " correctly and at correct position ", index)
         
         for index in yellowLettersIndex:
-            print("You have guessed ", guess[index], " correctly but at wrong position")
+            print("You have guessed ", guess[index], " correctly but at wrong position ", index)
         
         tries += 1
         
