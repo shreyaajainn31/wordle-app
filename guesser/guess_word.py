@@ -1,76 +1,88 @@
 import json
-import string
+import os
+import random
 
-API_URL = "/wordle/guess_word"
-SECRET_WORD = ""
+filename = os.path.join(os.getcwd(), 'words', 'nounlist.txt')
 
+def fetch_words(n):
+    with open(filename, 'r') as file:
+        words = [line.strip() for line in file if len(line.strip()) == n]
+    return words
 
-def guess_word(guess, n):
-    global SECRET_WORD
+def lambda_handler(event, context):
+    guess = event['guess']
+    n = int(event['n'])
+    tries = int(event['tries'])
+    MAX_TRIES = n + 1
     
-    tries = 0
-    MAX_TRIES = n+1
+    secret_word = random.choice(fetch_words(n))
     
-    if n == 5:
-        SECRET_WORD = "apple"
-    elif n == 6:
-        SECRET_WORD = "letter"
-    elif n == 7:
-        SECRET_WORD = "eardrop"
+    if secret_word is None:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'message': f'Invalid input. There is no word with length {n}.'})
+        }
     
     guess = guess.lower()
-    
     if len(guess) != n:
-        print("Invalid input. Length of word should be ", n, " characters")
-        
-    while tries < MAX_TRIES:
-        
-        greenLettersIndex = []
-        yellowLettersIndex = []
-        greyLetters = []
-        
-        # There are following cases
-        
-        
-        # 1. Letters are not in SECRET_WORD
-        # If yes color changes to grey
-        for char in guess:
-            if char not in SECRET_WORD:
-                greyLetters.append(char)
-        
-        # 2. If there are correct letters at the correct position
-        # If yes color changes to green
-        
-        for i,char in enumerate(guess):
-            if char == SECRET_WORD[i] and i not in greenLettersIndex:
-                greenLettersIndex.append(i)
-       
-        # 3. If there are correct letters at the incorrect position
-        # If yes color changes to yellow
-        for i, char in enumerate(guess):
-            if char in SECRET_WORD and char != SECRET_WORD[i] and i not in yellowLettersIndex and i not in greenLettersIndex:
-                yellowLettersIndex.append(i)
-                
-        print("These are the green letter words:")
-        for char_index in greenLettersIndex:
-            print(guess[char_index])
-
-        print("These are the yellow letter words:")
-        for char_index in yellowLettersIndex:
-            print(guess[char_index])
-
-        print("These are the grey letter words:")
-        for char in greyLetters:
-            print(char)
-
-        # We have the correct word
-        if len(greenLettersIndex) == n:
-            print("Congratulations!!!! ")
-            return [],[],[]       
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'message': f'Invalid input. Length of word should be {n} characters'})
+        }
+    
+    green_letters_index = []
+    yellow_letters_index = []
+    grey_letters = []
+    
+    # There are following cases
+    
+    # 1. Letters are not in secret_word
+    # If yes color changes to grey
+    for char in guess:
+        if char not in secret_word:
+            grey_letters.append(char)
+    
+    # 2. If there are correct letters at the correct position
+    # If yes color changes to green
+    for i,char in enumerate(guess):
+        if char == secret_word[i] and i not in green_letters_index:
+            green_letters_index.append(i)
+   
+    # 3. If there are correct letters at the incorrect position
+    # If yes color changes to yellow
+    for i, char in enumerate(guess):
+        if char in secret_word and char != secret_word[i] and i not in yellow_letters_index and i not in green_letters_index:
+            yellow_letters_index.append(i)
             
-        tries += 1
-        
-        if tries < MAX_TRIES:
-            guess = input("Enter your guess: ")
-        
-    return greenLettersIndex, yellowLettersIndex, greyLetters
+    green_letters = [guess[i] for i in green_letters_index]
+    yellow_letters = [guess[i] for i in yellow_letters_index]
+    
+    result = {
+        'green_letters': green_letters,
+        'yellow_letters': yellow_letters,
+        'grey_letters': grey_letters
+    }
+    
+    # We have the correct word
+    if len(green_letters_index) == n:
+        result['message'] = 'Congratulations!!!! '
+        return {
+            'statusCode': 200,
+            'body': json.dumps(result)
+        }
+    
+    tries += 1
+    
+    if tries < MAX_TRIES:
+        result['tries'] = tries
+        return {
+            'statusCode': 200,
+            'body': json.dumps(result)
+        }
+    
+    # Max tries reached
+    result['message'] = 'Max tries reached'
+    return {
+        'statusCode': 400,
+        'body': json.dumps(result)
+    }
