@@ -1,6 +1,13 @@
 import json
+import os
+import random
 
-words = {5: "apple", 6: "letter", 7: "eardrop"}
+filename = os.path.join(os.getcwd(), 'words', 'nounlist.txt')
+
+def fetch_words(n):
+    with open(filename, 'r') as file:
+        words = [line.strip() for line in file if len(line.strip()) == n]
+    return words
 
 def lambda_handler(event, context):
     guess = event['guess']
@@ -8,7 +15,8 @@ def lambda_handler(event, context):
     tries = int(event['tries'])
     MAX_TRIES = n + 1
     
-    secret_word = words.get(n)
+    secret_word = random.choice(fetch_words(n))
+    
     if secret_word is None:
         return {
             'statusCode': 400,
