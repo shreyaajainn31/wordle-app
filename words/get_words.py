@@ -1,8 +1,18 @@
-def fetch_words(filename, n_array):
-    words = []
+
+import os
+
+filename = os.path.join(os.getcwd(), 'words', 'nounlist.txt')
+
+def fetch_words(n):
     with open(filename, 'r') as file:
-        for line in file:
-            word = line.strip()
-            if len(word) in n_array:
-                words.append(word)
+        words = [line.strip() for line in file if len(line.strip()) == n]
     return words
+
+
+five_letter = fetch_words(5)
+six_letter = fetch_words(6)
+seven_letter = fetch_words(7)
+eight_letter = fetch_words(8)
+
+print(seven_letter)
+print(eight_letter)
