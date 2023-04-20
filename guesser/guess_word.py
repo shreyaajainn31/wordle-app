@@ -1,21 +1,34 @@
 import json
 import os
 import random
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
 
-filename = os.path.join(os.getcwd(), 'words', 'nounlist.txt')
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('words')
 
-def fetch_words(n):
-    with open(filename, 'r') as file:
-        words = [line.strip() for line in file if len(line.strip()) == n]
-    return words
+def get_random_word(n):
+    response = table.query(
+        IndexName='word_length_index',
+        KeyConditionExpression=Key('word_length').eq(n),
+        ProjectionExpression='word'
+    )
 
-def lambda_handler(event, context):
+    words = [item['word'] for item in response['Items']]
+
+    if words:
+        return random.choice(words)
+    else:
+        return None
+
+def guess_word(event, context):
     guess = event['guess']
     n = int(event['n'])
     tries = int(event['tries'])
     MAX_TRIES = n + 1
     
-    secret_word = random.choice(fetch_words(n))
+    secret_word = get_random_word(n)
+    print("secret ", secret_word)
     
     if secret_word is None:
         return {
