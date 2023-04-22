@@ -11,17 +11,21 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('words')
 
 
+# Global variables which would be used throughout
 secret_word = get_random_word()
+n = get_length_of_word()
+max_tries = n + 1
 
-# User would input the guess 
-# From the user side, the clicks on the button would decide 
-# Number of tries so frontend would send that 
+
+
    
 def guess_word(event, context):
+    # User would input the guess 
     guess = event['guess']
-    n = get_length_of_word()
+   
+    # From the user side, the clicks on the button would decide 
+    # number of tries so frontend would send that 
     tries = int(event['tries'])
-    MAX_TRIES = n + 1
     
     print("secret ", secret_word)
     
@@ -81,7 +85,7 @@ def guess_word(event, context):
     
     tries += 1
     
-    if tries < MAX_TRIES:
+    if tries < max_tries:
         result['tries'] = tries
         return {
             'statusCode': 200,
