@@ -3,31 +3,26 @@ import os
 import random
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
+from guesser.get_random_word import get_random_word
+from guesser.get_length_of_word import get_length_of_word
+from guesser.set_secret_word import set_secret_word
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('words')
 
-def get_random_word(n):
-    response = table.query(
-        IndexName='word_length_index',
-        KeyConditionExpression=Key('word_length').eq(n),
-        ProjectionExpression='word'
-    )
 
-    words = [item['word'] for item in response['Items']]
+secret_word = get_random_word()
 
-    if words:
-        return random.choice(words)
-    else:
-        return None
-
+# User would input the guess 
+# From the user side, the clicks on the button would decide 
+# Number of tries so frontend would send that 
+   
 def guess_word(event, context):
     guess = event['guess']
-    n = int(event['n'])
+    n = get_length_of_word()
     tries = int(event['tries'])
     MAX_TRIES = n + 1
     
-    secret_word = get_random_word(n)
     print("secret ", secret_word)
     
     if secret_word is None:
