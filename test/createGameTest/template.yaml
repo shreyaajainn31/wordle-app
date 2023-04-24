@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  CreateGameFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: /Users/shreya/Desktop/wordle-app/lambda/createGame/
+      Handler: create_game.create_game
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 10
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /create_game
+            Method: GET
