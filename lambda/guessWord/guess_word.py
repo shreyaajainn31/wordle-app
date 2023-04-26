@@ -11,8 +11,6 @@ def guess_word(event,context):
     length_of_word = get_word_length(game_id)
     secret_word = get_secret_word(game_id)
     max_tries = length_of_word + 1
-    print("length_of_word", length_of_word)
-    print("secret_word", secret_word)
     
     """
     This function has event as its parameter
